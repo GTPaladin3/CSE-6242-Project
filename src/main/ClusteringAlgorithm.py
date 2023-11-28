@@ -47,7 +47,7 @@ class ClusteringAlgorithm:
             inertia.append(kmeans.inertia_)
         differences = [inertia[i + 1] - inertia[i] for i in range(len(inertia) - 1)]
         min_drop_index = differences.index(np.median(differences))
-        # self.plot_elbow(possible_clusters, inertia)
+        self.plot_elbow(possible_clusters, inertia)
         return possible_clusters[min_drop_index]
 
     def plot_elbow(self, possible_clusters, inertia):
@@ -100,7 +100,7 @@ class ClusteringAlgorithm:
         clustered_songs_path = '../test/resources/spotify_song_data_clustered.csv'
         kmeans_cluster_df.to_csv(clustered_songs_path, index=False)
         print("5. Visualizing data")
-        # self.visualizing_results(pca_result.to_numpy(), kmeans_energy)
+        self.visualizing_results(pca_result.to_numpy(), kmeans_energy)
         end_time = datetime.now()
         elapsed_time = end_time - start_time
         print(f"Elapsed Time: {elapsed_time}")
@@ -109,8 +109,8 @@ class ClusteringAlgorithm:
     def get_song_clusters(self, energy, mood):
         clustered_songs_path = '../test/resources/spotify_song_data_clustered.csv'
         clustered_songs = pd.read_csv(clustered_songs_path)
-        energy_condition = clustered_songs['energy_cluster'] == energy
-        mood_condition = clustered_songs['mood_cluster'] == mood
+        energy_condition = clustered_songs['energy_cluster'] == energy + 1
+        mood_condition = clustered_songs['mood_cluster'] == mood + 1
         filtered_songs = clustered_songs[energy_condition & mood_condition]
         if filtered_songs.empty:
             energy_min = energy - 5

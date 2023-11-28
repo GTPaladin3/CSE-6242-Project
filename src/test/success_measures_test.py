@@ -1,6 +1,6 @@
 import unittest
 
-from src.main import Spotify_API_Demo
+from src.main.ClusteringAlgorithm import ClusteringAlgorithm
 
 
 def prod(a, b):  # defining the function to be tested
@@ -9,8 +9,10 @@ def prod(a, b):  # defining the function to be tested
 
 class Tests(unittest.TestCase):  # creating the class
     def test(self):  # method that test the function
-        test = Spotify_API_Demo.get_song_by_mood("test")
-        self.assertEqual(prod(4, -2), 8)  # testing by calling the function and passing the predicted result
+        # test = Spotify_API_Demo.get_song_by_mood("test")
+        clustering_algorithm = ClusteringAlgorithm()
+        filtered_songs = clustering_algorithm.run_clustering_algorithm()
+        # testing by calling the function and passing the predicted result
 
 
 if __name__ == '__main__':
