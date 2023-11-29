@@ -10,13 +10,12 @@ CSE-6242-Project has all the required components for clustering song data, a UI 
 6. src/test/resources/spotify_song_data_clustered.csv - song data clustered using k-means algorithm
 
 **INSTALLATION:**
-unzip team100final.zip
-cd CSE-6242-Project\src\main\
-Install below python packages
-pip install pytest
-pip install numpy matplotlib scikit-learn
-pip install streamlit
-pip install spotipy
+1. unzip team100final.zip
+2. cd CSE-6242-Project\src\main\
+3. pip install pytest
+4. pip install numpy matplotlib scikit-learn
+5. pip install streamlit
+6. pip install spotipy
 
 **EXECUTION:**
 1. cd src\main\
