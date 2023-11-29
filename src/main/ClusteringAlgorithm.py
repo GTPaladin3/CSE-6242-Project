@@ -13,7 +13,7 @@ class ClusteringAlgorithm:
         # Extract and store id, popularity and year values
         song_id = df['id'].values
         popularity = df['popularity'].values
-        year = df['year'].values
+        name = df['name'].values
 
         # Apply PCA on Energy Features
         energy_columns = ['acousticness', 'danceability', 'energy', 'explicit', 'liveness', 'tempo']
@@ -28,7 +28,7 @@ class ClusteringAlgorithm:
         # Combine PCA results with original track_uri values
         df_energy_mood_pca = pd.DataFrame(data={'song_id': song_id,
                                                 'popularity': popularity,
-                                                'year': year,
+                                                'name': name,
                                                 'PCA_Energy': pca_energy_result[:, 0],
                                                 'PCA_Mood': pca_mood_result[:, 0]})
         return df_energy_mood_pca
@@ -72,6 +72,8 @@ class ClusteringAlgorithm:
         start_time = datetime.now()
         print("1. Reading Songs DataSet")
         df_raw = pd.read_csv('../test/resources/spotify_song_data.csv')
+        df_raw = df_raw.drop_duplicates(subset=['name'])
+        df_raw = df_raw.drop_duplicates(subset=['id'])
         row, col = df_raw.shape
         print(f'There are {row} rows and {col} columns')
 
@@ -86,14 +88,14 @@ class ClusteringAlgorithm:
         print("4. Starting K-means clustering")
         song_id = pca_result['song_id'].values
         popularity = pca_result['popularity'].values
-        year = pca_result['year'].values
+        name = pca_result['name'].values
         kmeans_energy = KMeans(n_clusters=optimum_num_clusters, random_state=42)
         kmeans_energy.fit(pca_result[['PCA_Energy']])
         kmeans_mood = KMeans(n_clusters=optimum_num_clusters, random_state=42)
         kmeans_mood.fit(pca_result[['PCA_Mood']])
         kmeans_cluster_df = pd.DataFrame(data={'song_id': song_id,
                                                'popularity': popularity,
-                                               'year': year,
+                                               'name': name,
                                                'energy_cluster': kmeans_energy.labels_,
                                                'mood_cluster': kmeans_mood.labels_
                                                })
@@ -106,25 +108,43 @@ class ClusteringAlgorithm:
         print(f"Elapsed Time: {elapsed_time}")
         return clustered_songs_path
 
-    def get_song_clusters(self, energy, mood):
+    def derive_energy_mood_cluster(self, clustered_songs, input_song):
+        clustered_songs_data = clustered_songs[
+            clustered_songs['name'].str.contains(input_song, case=False)].sort_values(by='popularity',
+                                                                                      ascending=False).head(1)
+        energy_cluster = clustered_songs_data['energy_cluster'].iloc[0]
+        mood_cluster = clustered_songs_data['mood_cluster'].iloc[0]
+        return energy_cluster, mood_cluster
+
+    def get_song_clusters(self, energy, mood, input_song):
         clustered_songs_path = '../test/resources/spotify_song_data_clustered.csv'
         clustered_songs = pd.read_csv(clustered_songs_path)
-        energy_condition = clustered_songs['energy_cluster'] == energy + 1
-        mood_condition = clustered_songs['mood_cluster'] == mood + 1
-        filtered_songs = clustered_songs[energy_condition & mood_condition]
+        if input_song is not None:
+            energy, mood = self.derive_energy_mood_cluster(clustered_songs, input_song)
+        energy_condition = clustered_songs['energy_cluster'] == energy
+        mood_condition = clustered_songs['mood_cluster'] == mood
+        filtered_songs = clustered_songs[energy_condition & mood_condition].sort_values(by='popularity',
+                                                                                        ascending=False)
         if filtered_songs.empty or len(filtered_songs) < 5:
             energy_min = energy - 5
             energy_max = energy + 5
             mood_min = mood - 5
             mood_max = mood + 5
-            print(energy_min, energy_max, mood_min, mood_max)
             energy_condition_min = clustered_songs['energy_cluster'] > energy_min
             energy_condition_max = clustered_songs['energy_cluster'] <= energy_max
             mood_condition_min = clustered_songs['mood_cluster'] > mood_min
-            mood_condition_max = clustered_songs['mood_cluster'] >= mood_max
-            filtered_songs = clustered_songs[energy_condition_min & energy_condition_max
-                                             & mood_condition_min & mood_condition_max]
-            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(5)
+            mood_condition_max = clustered_songs['mood_cluster'] <= mood_max
+            filtered_songs_add = clustered_songs[energy_condition_min & energy_condition_max
+                                                 & mood_condition_min & mood_condition_max].sort_values(by='popularity',
+                                                                                                        ascending=False)
+            filtered_songs_add = filtered_songs_add[~energy_condition & ~mood_condition]
+            filtered_songs = filtered_songs.append(filtered_songs_add)
+        if input_song is not None:
+            popular_songs = filtered_songs[filtered_songs['name'].str.contains(input_song, case=False)].head(5)
+            if popular_songs.empty or len(popular_songs) < 5:
+                popular_songs_add = filtered_songs[~filtered_songs['name'].str.contains(input_song, case=False)]
+                popular_songs_add = popular_songs_add.head(5 - len(popular_songs))
+                popular_songs = popular_songs.append(popular_songs_add)
         else:
-            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(5)
+            popular_songs = filtered_songs.head(5)
         return popular_songs
