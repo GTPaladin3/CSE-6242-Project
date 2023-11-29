@@ -22,8 +22,8 @@ pip install spotipy
 cd src\main\
 streamlit run App.py
 Click to refresh emotion/mood clusters using spotify song dataset --> This option will build emotion and mood clusters for spotify song data set under CSE-6242-Project\src\test\resources\spotify_song_data.csv. Ouput will be stored in CSE-6242-Project\src\test\resources\spotify_song_data_clustered.csv
-Enter a song you like or use the mood selector bar on left:
-Enter song in the text box and click on recommend songs, this option will provide five recommendations based on entered keyword
+Enter a song you like or use the mood selector bar on left
+Enter song (for example: Christmas) in the text box and click on recommend songs, this option will provide five recommendations based on entered keyword
 Clear keyword in the text box, use the sliders to select energy/mood and click on recommend songs, this option will provide three recommendations based on energy/mood selected
 
 **DEMO VIDEO: **
