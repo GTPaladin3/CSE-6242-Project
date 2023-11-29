@@ -112,8 +112,13 @@ class ClusteringAlgorithm:
         clustered_songs_data = clustered_songs[
             clustered_songs['name'].str.contains(input_song, case=False)].sort_values(by='popularity',
                                                                                       ascending=False).head(1)
-        energy_cluster = clustered_songs_data['energy_cluster'].iloc[0]
-        mood_cluster = clustered_songs_data['mood_cluster'].iloc[0]
+        if not clustered_songs_data.empty:
+            energy_cluster = clustered_songs_data['energy_cluster'].iloc[0]
+            mood_cluster = clustered_songs_data['mood_cluster'].iloc[0]
+        else:
+            # assign a cluster outside range to return no song found when song matching keyword not found
+            energy_cluster = 110
+            mood_cluster = 110
         return energy_cluster, mood_cluster
 
     def get_song_clusters(self, energy, mood, input_song):

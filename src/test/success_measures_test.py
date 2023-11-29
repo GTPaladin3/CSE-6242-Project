@@ -14,7 +14,7 @@ class Tests(unittest.TestCase):  # creating the class
         self.assertEqual(137013, len(clustered_songs))
 
     def test_cluster_assignment_by_energy_mood(self):
-        # method that tests the count of clustered songs
+        # test to ensure song is returned when invalid energy and mood coordinates are passed
         clustering_algorithm = ClusteringAlgorithm()
         energy = 0
         mood = 2
@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):  # creating the class
             self.assertGreater(row['mood_cluster'], mood_min)
 
     def test_cluster_assignment_by_name(self):
-        # method that tests the count of clustered songs
+        # test to ensure song is returned when valid song name keyword is passed
         clustering_algorithm = ClusteringAlgorithm()
         clustered_songs_path = '../test/resources/spotify_song_data_clustered.csv'
         clustered_songs = pd.read_csv(clustered_songs_path)
@@ -55,8 +55,15 @@ class Tests(unittest.TestCase):  # creating the class
             self.assertLessEqual(row['mood_cluster'], mood_max)
             self.assertGreater(row['mood_cluster'], mood_min)
 
-    def validate(a, b):  # defining the function to be tested
-        return a * b
+    def test_cluster_assignment_by_name_song_not_found(self):
+        # test to ensure no song is returned when invalid song name keyword is passed
+        clustering_algorithm = ClusteringAlgorithm()
+        clustered_songs_path = '../test/resources/spotify_song_data_clustered.csv'
+        clustered_songs = pd.read_csv(clustered_songs_path)
+        song_name = 'dandanakka'
+        energy, mood = clustering_algorithm.derive_energy_mood_cluster(clustered_songs, song_name)
+        identified_songs = clustering_algorithm.get_song_clusters(None, None, song_name)
+        self.assertEqual(0, len(identified_songs))
 
 
 if __name__ == '__main__':
