@@ -112,7 +112,7 @@ class ClusteringAlgorithm:
         energy_condition = clustered_songs['energy_cluster'] == energy + 1
         mood_condition = clustered_songs['mood_cluster'] == mood + 1
         filtered_songs = clustered_songs[energy_condition & mood_condition]
-        if filtered_songs.empty:
+        if filtered_songs.empty or len(filtered_songs) < 5:
             energy_min = energy - 5
             energy_max = energy + 5
             mood_min = mood - 5
@@ -124,7 +124,7 @@ class ClusteringAlgorithm:
             mood_condition_max = clustered_songs['mood_cluster'] >= mood_max
             filtered_songs = clustered_songs[energy_condition_min & energy_condition_max
                                              & mood_condition_min & mood_condition_max]
-            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(3)
+            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(5)
         else:
-            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(3)
+            popular_songs = filtered_songs.sort_values(by='popularity', ascending=False).head(5)
         return popular_songs
