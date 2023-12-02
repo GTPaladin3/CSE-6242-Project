@@ -73,7 +73,7 @@ def main():
     if st.button("Recommend Songs"):
         # if input song is present use that or else call your recommendation function
         # here and display the recommended songs
-        if input_song:
+        if input_song.strip() != "":
             st.write(f"Recommendation Based on Input Song: {input_song}")
             recommended_songs = recommend_songs(None, None, input_song)
             # Get song information from Spotify API
