@@ -44,7 +44,7 @@ class ClusteringAlgorithm:
         for num_clusters in possible_clusters:
             kmeans = KMeans(n_clusters=num_clusters, random_state=42)
             kmeans.fit(random_sample)
-            inertia._append(kmeans.inertia_)
+            inertia.append(kmeans.inertia_)
         differences = [inertia[i + 1] - inertia[i] for i in range(len(inertia) - 1)]
         min_drop_index = differences.index(np.median(differences))
         self.plot_elbow(possible_clusters, inertia)
@@ -143,13 +143,13 @@ class ClusteringAlgorithm:
                                                  & mood_condition_min & mood_condition_max].sort_values(by='popularity',
                                                                                                         ascending=False)
             filtered_songs_add = filtered_songs_add[~energy_condition & ~mood_condition]
-            filtered_songs = filtered_songs._append(filtered_songs_add)
+            filtered_songs = pd.concat([filtered_songs, filtered_songs_add])
         if input_song is not None:
             popular_songs = filtered_songs[~filtered_songs['name'].str.contains(input_song, case=False)].head(5)
             if popular_songs.empty or len(popular_songs) < 5:
                 popular_songs_add = filtered_songs[~filtered_songs['name'].str.contains(input_song, case=False)]
                 popular_songs_add = popular_songs_add.head(5 - len(popular_songs))
-                popular_songs = popular_songs._append(popular_songs_add)
+                popular_songs = pd.concat([popular_songs, popular_songs_add])
         else:
             popular_songs = filtered_songs.head(5)
         return popular_songs

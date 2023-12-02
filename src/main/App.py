@@ -102,9 +102,9 @@ def main():
         st.warning("No data to display.")
 
     # Button to trigger recommendation
-    #if st.button("Click to Refresh Mood Clusters"):
-     #   refresh_song_cluster()
-      #  st.info("Song Cluster Refresh Completed")
+    # if st.button("Click to Refresh Mood Clusters"):
+    #   refresh_song_cluster()
+    #  st.info("Song Cluster Refresh Completed")
 
 
 if __name__ == "__main__":
